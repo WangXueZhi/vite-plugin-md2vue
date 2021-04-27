@@ -43,3 +43,5 @@ export default defineComponent({
 ## options
 
 renderWrapperClass: 作为渲染结果最外层容器的class
+markedOptions: marked的setOptions配置
+markedRender: marked的render配置

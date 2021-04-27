@@ -1,7 +1,10 @@
 const marked = require("marked");
+const hljs = require("highlight.js");
 
 export type OptionsObject = {
   renderWrapperClass?: string | string[];
+  markedOptions? : Object;
+  markedRender? : Object;
 };
 
 export default function vitePluginMd2Vue(options?: OptionsObject) {
@@ -14,6 +17,26 @@ export default function vitePluginMd2Vue(options?: OptionsObject) {
       classArray.push(...options.renderWrapperClass);
     }
   }
+
+  const defaultRenderer = {};
+
+  marked.use({
+    renderer: options && options.markedRender ? {...defaultRenderer, ...options.markedRender } : defaultRenderer,
+  });
+
+  const defaultMarkedOptions = {
+    highlight: function (code: string) {
+      return `<div class="md-code-hijs">${
+        hljs.highlightAuto(code).value
+      }</div>`;
+    },
+  };
+
+  marked.setOptions(
+    options && options.markedOptions
+      ? { ...defaultMarkedOptions, ...options.markedOptions }
+      : defaultMarkedOptions
+  );
 
   return {
     name: "vitePluginMd2Vue",
