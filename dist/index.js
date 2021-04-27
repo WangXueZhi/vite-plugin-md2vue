@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const marked = require("marked");
+const hljs = require("highlight.js");
 function vitePluginMd2Vue(options) {
     const classArray = ["md2vue-wrapper"];
     if (options && options.renderWrapperClass) {
@@ -11,6 +12,18 @@ function vitePluginMd2Vue(options) {
             classArray.push(...options.renderWrapperClass);
         }
     }
+    const defaultRenderer = {};
+    marked.use({
+        renderer: options && options.markedRender ? { ...defaultRenderer, ...options.markedRender } : defaultRenderer,
+    });
+    const defaultMarkedOptions = {
+        highlight: function (code) {
+            return `<div class="md-code-hijs">${hljs.highlightAuto(code).value}</div>`;
+        },
+    };
+    marked.setOptions(options && options.markedOptions
+        ? { ...defaultMarkedOptions, ...options.markedOptions }
+        : defaultMarkedOptions);
     return {
         name: "vitePluginMd2Vue",
         transform(src, id) {

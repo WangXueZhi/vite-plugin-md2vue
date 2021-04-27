@@ -1,5 +1,7 @@
 export declare type OptionsObject = {
     renderWrapperClass?: string | string[];
+    markedOptions?: Object;
+    markedRender?: Object;
 };
 export default function vitePluginMd2Vue(options?: OptionsObject): {
     name: string;

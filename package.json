@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-md2vue",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "vite plugin to transform  markdown to vue",
   "main": "dist/index.js",
   "scripts": {
