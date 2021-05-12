@@ -3,8 +3,8 @@ const hljs = require("highlight.js");
 
 export type OptionsObject = {
   renderWrapperClass?: string | string[];
-  markedOptions? : Object;
-  markedRender? : Object;
+  markedOptions?: Object;
+  markedRender?: Object;
 };
 
 export default function vitePluginMd2Vue(options?: OptionsObject) {
@@ -21,11 +21,17 @@ export default function vitePluginMd2Vue(options?: OptionsObject) {
   const defaultRenderer = {};
 
   marked.use({
-    renderer: options && options.markedRender ? {...defaultRenderer, ...options.markedRender } : defaultRenderer,
+    renderer:
+      options && options.markedRender
+        ? { ...defaultRenderer, ...options.markedRender }
+        : defaultRenderer,
   });
 
   const defaultMarkedOptions = {
-    highlight: function (code: string) {
+    highlight: function (code: string, lang: string) {
+      if (lang === "mermaid") {
+        return `<div class='mermaid'>${code}</div>`;
+      }
       return `<div class="md-code-hijs">${
         hljs.highlightAuto(code).value
       }</div>`;
@@ -42,6 +48,24 @@ export default function vitePluginMd2Vue(options?: OptionsObject) {
     name: "vitePluginMd2Vue",
     transform(src: any, id: any) {
       if (id.endsWith(".md")) {
+        let mermaidRenderCode = ''
+        if(src.includes('```mermaid')){
+          mermaidRenderCode = `
+          const mermaidDoms = document.querySelectorAll('.mermaid')
+          if(mermaidDoms && mermaidDoms.length>0){
+            import('mermaid').then(res=>{
+              res.initialize({
+                theme: 'forest'
+              })
+              mermaidDoms.forEach((dom,index)=>{
+                res.render('mermaid'+index, dom.innerText, (t)=>{
+                  dom.innerHTML = t
+                })
+              })
+            })
+          }
+          `
+        }
         return {
           code: `import {h, defineComponent} from "vue";
           const _sfc_md = defineComponent({
@@ -56,6 +80,9 @@ export default function vitePluginMd2Vue(options?: OptionsObject) {
           };
           
           _sfc_md.render = _sfc_render
+          _sfc_md.mounted = ()=>{
+            ${mermaidRenderCode}
+          }
           export default _sfc_md`,
           map: null,
         };
