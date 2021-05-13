@@ -1,19 +1,17 @@
 # vite-plugin-md2vue
 
-[中文文档](./README_CN.md)
+## 介绍
 
-## Introduction
+vite插件，将markdown模块以vue组件导出
 
-vite plugin, import markdown module as vue component
-
-## Install
+## 安装
 ```
 npm i vite-plugin-md2vue --save-dev
 
 yarn add vite-plugin-md2vue -D
 ```
 
-## Use
+## 使用
 ```javascript
 // vite.config.js
 import { defineConfig } from "vite";
@@ -44,15 +42,17 @@ export default defineComponent({
 </script>
 ```
 
-## Options
+## 配置选项
 
-| name    | describe |
+| 名称    | 说明     |
 | ------- | -------- |
-| renderWrapperClass  | as outer container's class attribute |
-| markedOptions | marked's [setOptions config](https://marked.js.org/using_advanced#options) |
-| markedRender | marked's [render config](https://marked.js.org/using_pro#renderer) |
+| renderWrapperClass    | 作为渲染结果最外层容器的class |
+| markedOptions | marked的[setOptions配置](https://marked.js.org/using_advanced#options) |
+| markedRender | marked的[render配置](https://marked.js.org/using_pro#renderer) |
 
-## Support
 
-You can create diagrams and visualizations using [Mermaid](https://mermaid-js.github.io/mermaid/#/)
+## 支持
+
+你可以使用[Mermaid](https://mermaid-js.github.io/mermaid/#/)语法在markdown中创建各种图表
+
 
