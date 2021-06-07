@@ -17,7 +17,7 @@
 
 ## Introduction
 
-vite plugin, import markdown module as vue component
+vite plugin, import markdown module as vue3 component. Note that this plugin only supports vue3!
 
 ## Install
 

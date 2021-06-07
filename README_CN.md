@@ -14,7 +14,7 @@
 
 ## 介绍
 
-vite插件，将markdown模块以vue组件导出
+vite插件，将markdown模块以vue3组件导出，注意本插件只支持vue3！
 
 ## 安装
 ```
