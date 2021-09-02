@@ -1,7 +1,9 @@
 export declare type OptionsObject = {
     renderWrapperClass?: string | string[];
     markedOptions?: Object;
-    markedRender?: Object;
+    markedRender?: {
+        heading?: Function;
+    };
     mermaidLoadingHtml?: string;
 };
 export default function vitePluginMd2Vue(options?: OptionsObject): {

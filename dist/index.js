@@ -2,17 +2,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const marked = require("marked");
 const hljs = require("highlight.js");
-function vitePluginMd2Vue(options) {
-    const classArray = ["md2vue-wrapper"];
-    if (options && options.renderWrapperClass) {
-        if (typeof options.renderWrapperClass === "string") {
-            classArray.push(options.renderWrapperClass);
+let keyWordsInOneMd = [];
+const markedInit = function (options = {}) {
+    marked.defaults.renderer = null;
+    const defaultRenderer = {
+        heading(text, level, raw, slugger) {
+            keyWordsInOneMd.push(text);
+            return `<h${level} id="${text}">${raw}</h${level}>`;
         }
-        if (Array.isArray(options.renderWrapperClass)) {
-            classArray.push(...options.renderWrapperClass);
-        }
+    };
+    // 处理自定义heading渲染
+    if (options.markedRender?.heading) {
+        const { heading, ...restRender } = options.markedRender;
+        options.markedRender = restRender;
+        defaultRenderer.heading = function (text, level, raw, slugger) {
+            keyWordsInOneMd.push(text);
+            return heading(text, level, raw, slugger);
+        };
     }
-    const defaultRenderer = {};
     marked.use({
         renderer: options && options.markedRender
             ? { ...defaultRenderer, ...options.markedRender }
@@ -32,10 +39,23 @@ function vitePluginMd2Vue(options) {
     marked.setOptions(options && options.markedOptions
         ? { ...defaultMarkedOptions, ...options.markedOptions }
         : defaultMarkedOptions);
+};
+function vitePluginMd2Vue(options) {
+    const classArray = ["md2vue-wrapper"];
+    if (options && options.renderWrapperClass) {
+        if (typeof options.renderWrapperClass === "string") {
+            classArray.push(options.renderWrapperClass);
+        }
+        if (Array.isArray(options.renderWrapperClass)) {
+            classArray.push(...options.renderWrapperClass);
+        }
+    }
     return {
         name: "vitePluginMd2Vue",
         transform(src, id) {
             if (id.endsWith(".md")) {
+                markedInit(options);
+                keyWordsInOneMd = [];
                 let mermaidRenderCode = '';
                 if (src.includes('```mermaid')) {
                     mermaidRenderCode = `
@@ -65,6 +85,7 @@ function vitePluginMd2Vue(options) {
           }
           `;
                 }
+                const markdownHtml = marked(src);
                 return {
                     code: `import {h, defineComponent} from "vue";
           const _sfc_md = defineComponent({
@@ -74,7 +95,7 @@ function vitePluginMd2Vue(options) {
           const _sfc_render =() => {
             return h("div", {
               class: ${JSON.stringify(classArray)},
-              innerHTML: ${JSON.stringify(marked(src))},
+              innerHTML: ${JSON.stringify(markdownHtml)},
             })
           };
           
@@ -82,7 +103,8 @@ function vitePluginMd2Vue(options) {
           _sfc_md.mounted = ()=>{
             ${mermaidRenderCode}
           }
-          export default _sfc_md`,
+          export default _sfc_md
+          export const headings = ${JSON.stringify(keyWordsInOneMd)}`,
                     map: null,
                 };
             }
