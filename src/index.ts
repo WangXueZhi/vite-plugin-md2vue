@@ -21,7 +21,7 @@ const markedInit = function(options: OptionsObject = {}){
       keyWordsInOneMd.push(text)
       return `<h${level} id="${text}">${raw}</h${level}>`
     },
-    code(code: string, infostring: string, escape: Function){
+    code(code: string, infostring: string, escape: Function): string{
       const langArr = infostring.match(/\S*/);
       const lang = langArr?langArr[0]:'';
 
