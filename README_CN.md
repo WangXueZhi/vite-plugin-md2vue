@@ -43,7 +43,7 @@ export default defineConfig({
 
 <script>
 import { defineComponent } from 'vue'
-import Start, { headings } from 'docs/start.md'
+import Start, { headings, codeBlocks } from 'docs/start.md'
 
 export default defineComponent({
   name: 'App',
@@ -57,7 +57,8 @@ export default defineComponent({
 | 名称               | 说明   | 类型 |
 | ------------------ | ------ | ------------------------------------------------------------------------------------------------------------------- |
 | 默认导出            | vue 组件 |    |
-| headings            | 文档的标题列表对象数组 | {text:string, level: number}[] |
+| headings            | 文档的标题列表对象数组 | {text:string, level: number, raw: string}[] |
+| codeBlocks            | 文档的代码块列表对象数组 | {code: string, infostring: string}[] |
 
 ## 配置选项
 

@@ -63,7 +63,10 @@ export default defineComponent({
 | name               | describe   | type |
 | ------------------ | ------ | ------------------------------------------------------------------------------------------------------------------- |
 | default            | vue component |    |
-| headings            | markdown headings object list | {text:string, level: number}[] |
+| headings            | markdown headings list | {text:string, level: number, raw: string}[] |
+| codeBlocks            | markdown code block list | {code: string, infostring: string}[] |
+
+
 ## Options
 
 | name               | type   | describe                                                                                                            |
