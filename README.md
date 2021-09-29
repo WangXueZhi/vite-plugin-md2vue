@@ -48,7 +48,7 @@ export default defineConfig({
 
 <script>
 import { defineComponent } from 'vue'
-import Start from 'docs/start.md'
+import Start, { headings }  from 'docs/start.md'
 
 export default defineComponent({
   name: 'App',
@@ -59,6 +59,11 @@ export default defineComponent({
 </script>
 ```
 
+## module exports
+| name               | describe   | type |
+| ------------------ | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| default            | vue component |    |
+| headings            | markdown headings object list | {text:string, level: number}[] |
 ## Options
 
 | name               | type   | describe                                                                                                            |

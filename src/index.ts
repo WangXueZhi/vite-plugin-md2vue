@@ -1,5 +1,6 @@
 const marked = require("marked");
 const hljs = require("highlight.js");
+const { escape } = require('marked/src/helpers.js');
 
 export type OptionsObject = {
   renderWrapperClass?: string | string[];
@@ -11,26 +12,45 @@ export type OptionsObject = {
   mermaidLoadingHtml?: string;
 };
 
-let keyWordsInOneMd: string[] = []
+type headingType = {
+  text: string,
+  level: number,
+  raw: string
+}
+
+type codeType = {
+  code: string, 
+  infostring: string
+}
+
+let headingsInfoList: headingType[] = []
+let codeInfoList: codeType[] = []
 
 const markedInit = function(options: OptionsObject = {}){
   marked.defaults.renderer = null
 
   const defaultRenderer = {
     heading(text: string, level: number, raw: string, slugger:any){
-      keyWordsInOneMd.push(text)
+      headingsInfoList.push({text, level, raw})
+      if(options.markedRender && options.markedRender.heading){
+        return options.markedRender.heading(...arguments)
+      }
       return `<h${level} id="${text}">${raw}</h${level}>`
     },
-    code(code: string, infostring: string, escape: Function): string{
+    code(code: string, infostring: string): string{
       const langArr = infostring.match(/\S*/);
       const lang = langArr?langArr[0]:'';
+      codeInfoList.push({code, infostring})
+
+      if(options.markedRender && options.markedRender.code){
+        return options.markedRender.code(...arguments)
+      }
 
       if (infostring === 'mermaid') {
-        return `<div class='mermaidWrapper' style="position: relative">
+        return `<pre><code class="language-mermaid"><div class='mermaidWrapper' style="position: relative">
           ${options && options.mermaidLoadingHtml ? options.mermaidLoadingHtml : '<div class="mermaid-loading" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: rgba(0, 0, 0, 0.54)">loading...</div>'}
-          <div class='mermaid' style="opacity: 0">${code}</div>
-        </div>`;
-        // return `<div class='mermaid'>${code}</div>`;
+            <div class='mermaid' style="opacity: 0">${code}</div>
+        </div></code></pre>`;
       }
       
       // @ts-ignore
@@ -46,35 +66,15 @@ const markedInit = function(options: OptionsObject = {}){
     }
   };
 
-  // 处理自定义heading渲染
-  if(options.markedRender && options.markedRender.heading){
-    const {heading, ...restRender} = options.markedRender
-    options.markedRender = restRender
-    defaultRenderer.heading = function(text: string, level: number, raw: string, slugger:any){
-      keyWordsInOneMd.push(text)
-      return heading(text, level, raw, slugger)
-    }
-  }
-
   marked.use({
     renderer:
       options && options.markedRender
-        ? { ...defaultRenderer, ...options.markedRender }
+        ? { ...options.markedRender, ...defaultRenderer }
         : defaultRenderer,
   });
 
   const defaultMarkedOptions = {
     highlight: function (code: string, lang: string) {
-      if (lang === "mermaid") {
-        return `<div class='mermaidWrapper' style="position: relative">
-          ${options && options.mermaidLoadingHtml ? options.mermaidLoadingHtml : '<div class="mermaid-loading" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: rgba(0, 0, 0, 0.54)">loading...</div>'}
-          <div class='mermaid' style="opacity: 0">${code}</div>
-        </div>`;
-      }
-      return `<div class="md-code-hijs">${
-        hljs.highlightAuto(code).value
-      }</div>`;
-
       return hljs.highlightAuto(code).value
     },
   };
@@ -102,7 +102,7 @@ export default function vitePluginMd2Vue(options?: OptionsObject) {
     transform(src: any, id: any) {
       if (id.endsWith(".md")) {
         markedInit(options)
-        keyWordsInOneMd = []
+        headingsInfoList = []
         let mermaidRenderCode = ''
         if(src.includes('```mermaid')){
           mermaidRenderCode = `
@@ -152,7 +152,8 @@ export default function vitePluginMd2Vue(options?: OptionsObject) {
             ${mermaidRenderCode}
           }
           export default _sfc_md
-          export const headings = ${JSON.stringify(keyWordsInOneMd)}`,
+          export const headings = ${JSON.stringify(headingsInfoList)}
+          export const codeBlocks = ${JSON.stringify(codeInfoList)}`,
           map: null,
         };
       }
