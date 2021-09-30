@@ -48,7 +48,7 @@ export default defineConfig({
 
 <script>
 import { defineComponent } from 'vue'
-import Start, { headings }  from 'docs/start.md'
+import Start, { headings, codeBlocks }  from 'docs/start.md'
 
 export default defineComponent({
   name: 'App',
