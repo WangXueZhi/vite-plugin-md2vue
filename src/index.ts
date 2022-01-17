@@ -125,8 +125,8 @@ export default function vitePluginMd2Vue(options?: OptionsObject) {
             } else {
               import('mermaid').then(res=>{
                 window._mermaidLoaded = true
-                window._mermaidModule = res
-                renderMermaid(res, mermaidDoms)
+                window._mermaidModule = res.default
+                renderMermaid(res.default, mermaidDoms)
               })
             }
           }
